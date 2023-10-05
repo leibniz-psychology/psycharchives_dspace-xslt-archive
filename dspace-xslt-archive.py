@@ -20,7 +20,8 @@ handles = {'article':'20.500.12034/6', 'bachelorThesis':'20.500.12034/723',
 			'sound':'20.500.12034/722', 'test':'20.500.12034/12'}
 
 # {'schema': 'XSLT file'}
-xsl_files = {'dc': 'xoai_to_dc-psycharchives.xsl', 'zpid': 'xoai_to_zpid-psycharchives.xsl'}
+# xsl_files = {'dc': 'xoai-ssoar_to_dc-psycharchives.xsl', 'zpid': 'xoai-ssoar_to_zpid-psycharchives.xsl'}
+xsl_files = {'dc': 'jats-psychosozial-verlag_to_dc-psycharchives.xslt', 'zpid': 'jats-psychosozial-verlag_to_zpid-psycharchives.xslt'}
 
 # For writing the file `collections`
 collection = handles['article']
@@ -34,8 +35,10 @@ if len(sys.argv) != 2:
 	sys.exit()
 
 input_base_path = sys.argv[1]
+if input_base_path[-1] == '/':	# chop off the end character "/", if provided as part of the directory name
+	input_base_path = input_base_path[:-1]
+
 output_path = input_base_path + "_saf"
-print(output_path)
 
 archive = DspaceArchive(input_base_path, xsl_files, collection)
 

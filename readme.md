@@ -40,7 +40,12 @@ Some Simple Rules:
 * Sets variables `xsl_files` and `collection` in `dspace-xslt-archive.py`
 * **NOTE:**
 	* The name of the directory `make_simple_archive_format` does not matter, but the names of its subdirectories must be `PDF` and `XML`.
-	* The PDF files and their corresponding XML documents must have the same file basename.
+	* The PDF files and their corresponding XML documents must contain the same `file_basename` (e.g. `32302` in `003-003 32302.pdf` and `8454-32302.xml`).
+    ```
+    file_basename = re.search("\d+.pdf", pdf_filename)
+    file_basename = file_basename.group()
+    file_basename = file_basename[:-4]
+    ```
 
 
 Simple Archive Format (Example): 

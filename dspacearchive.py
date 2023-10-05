@@ -5,6 +5,7 @@ See: https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+
 """
 
 import os
+import re
 from item import Item
 from saxonche import *
 from shutil import copy, make_archive
@@ -24,15 +25,20 @@ class DspaceArchive:
         self.collection = collection
 
         for pdf_filename in os.listdir(os.path.join(self.input_base_path, 'PDF')):
-            print(pdf_filename)
-            file_basename = pdf_filename[:-4]
-            print(file_basename)
+            # file_basename = re.findall("\d+.pdf", pdf_filename) # Involve the filename pattern of Psychosozial-Verlag.
+            # file_basename = file_basename[0]
+            # file_basename = file_basename[:-4]
+
+            file_basename = re.search("\d+.pdf", pdf_filename) # Involve the filename pattern of Psychosozial-Verlag.
+            file_basename = file_basename.group()
+            file_basename = file_basename[:-4]
+
 
             for xml_filename in os.listdir(os.path.join(self.input_base_path, 'XML')):
                 if (file_basename in xml_filename):
                     print(xml_filename)
-                    item = Item(file_basename)
-                    print(vars(item))
+                    item = Item(file_basename, pdf_filename, xml_filename)
+                    # print(vars(item))
                     self.addItem(item)
 
     """
@@ -59,7 +65,7 @@ class DspaceArchive:
             #item directory
             item_path = os.path.join(dir, item.basename)
             self.create_directory(item_path)
-            print("====== Writing Item: ", item_path, " ======")
+            print("====== Writing Item_%03d: " % (int(index) + 1), item_path, " ======")
 
             #contents file
             self.writeContentsFile(item, item_path)
@@ -108,13 +114,16 @@ class DspaceArchive:
     def copyFiles(self, item, item_path):
         copy(os.path.join(self.input_base_path, 'PDF' , item.pdf), item_path)
 
+    """
+    Convert input XML documents into PsychArchives Metadata Schema  
+    """
     def writeMetadata(self, item, item_path):
-
         with PySaxonProcessor(license=False) as proc:
             xsltproc = proc.new_xslt30_processor()
             for schema, stylesheet in self.xsl_files.items():
-                executable = xsltproc.compile_stylesheet(stylesheet_file=stylesheet)
+                executable = xsltproc.compile_stylesheet(stylesheet_file=stylesheet, version='2.0')
                 executable.set_initial_match_selection(file_name=os.path.join(self.input_base_path, 'XML' , item.xml))
+                executable.set_global_context_item(file_name=os.path.join(self.input_base_path, 'XML' , item.xml))  # Set the global context item for the transformation. (Enable the use of global variables in XSLT)
 
                 if schema == 'dc':
                     xml_filename = 'dublin_core.xml'

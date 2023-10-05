@@ -6,9 +6,9 @@ An item has a collection of files (aka Bitstreams) and a number of metadata name
 
 class Item:
 
-    def __init__(self, file_basename):
+    def __init__(self, file_basename, pdf_filename, xml_filename):
         self.basename = file_basename
-        self.pdf = file_basename + ".pdf"
-        self.xml = file_basename + ".xml"
+        self.pdf = pdf_filename
+        self.xml = xml_filename
 
         
