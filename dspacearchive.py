@@ -24,22 +24,28 @@ class DspaceArchive:
         self.xsl_files = xsl_files
         self.collection = collection
 
-        for pdf_filename in os.listdir(os.path.join(self.input_base_path, 'PDF')):
-            # file_basename = re.findall("\d+.pdf", pdf_filename) # Involve the filename pattern of Psychosozial-Verlag.
-            # file_basename = file_basename[0]
-            # file_basename = file_basename[:-4]
-
-            file_basename = re.search("\d+.pdf", pdf_filename) # Involve the filename pattern of Psychosozial-Verlag.
-            file_basename = file_basename.group()
-            file_basename = file_basename[:-4]
-
-
+        """
+        Extract file_basename from XML filename
+        @pdf_files: An Array which contains all bitstreams of an item. An item can contain more than one bitstreams (PDF files).
+        @file_basename: Both XML and PDF must contain the same @file_basename, so that they can be matched
+        """
+        if os.path.exists(os.path.join(self.input_base_path, 'XML')):
             for xml_filename in os.listdir(os.path.join(self.input_base_path, 'XML')):
-                if (file_basename in xml_filename):
-                    print(xml_filename)
-                    item = Item(file_basename, pdf_filename, xml_filename)
-                    # print(vars(item))
-                    self.addItem(item)
+                # file_basename = xml_filename[:-4] # Remove '.xml'
+                file_basename = xml_filename[:-5] # Remove '.html'
+                # file_basename = file_basename.split('-')[1] # e.g. '8494-34111' --> '34111'
+
+                pdf_files = [] # An item can contain more than one file (bitstream)
+                for pdf_filename in os.listdir(os.path.join(self.input_base_path, 'PDF-A')):
+                    # filename = re.search("\d+.pdf", pdf_filename) # Involve the filename pattern of Psychosozial-Verlag, e.g. '070-089 34088.pdf' get '34088.pdf' @return a Match object
+                    # filename = filename.group() # @return the part of the string where there was a match
+                    if (file_basename in pdf_filename[:-4]): # Remove '.pdf'
+                        pdf_files.append(pdf_filename)
+
+                item = Item(file_basename, pdf_files, xml_filename)
+                # print(vars(item))
+                self.addItem(item)
+        
 
     """
     Add an item to the archive. 
@@ -96,9 +102,10 @@ class DspaceArchive:
     Create a contents file that contains a lits of bitstreams, one per line. 
     """
     def writeContentsFile(self, item, item_path):
-        contents_file = open(os.path.join(item_path, 'contents'), "w")
-        contents_file.write(item.pdf)
-        contents_file.close()
+        for pdf_filename in item.pdf:
+            contents_file = open(os.path.join(item_path, 'contents'), "a")
+            contents_file.write(pdf_filename + "\n")
+            contents_file.close()
 
     """
     Create a collections file that contains the collection(s) for an item
@@ -112,7 +119,8 @@ class DspaceArchive:
     Copy the files that are referenced by an item to the item directory in the DSPace simple archive. 
     """
     def copyFiles(self, item, item_path):
-        copy(os.path.join(self.input_base_path, 'PDF' , item.pdf), item_path)
+        for pdf_filename in item.pdf:
+            copy(os.path.join(self.input_base_path, 'PDF-A' , pdf_filename), item_path)
 
     """
     Convert input XML documents into PsychArchives Metadata Schema  

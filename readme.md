@@ -33,13 +33,13 @@ Example Structure:
 Some Simple Rules:
 ---------------------
 * Usage: ./dspace-xslt-archive.py `make_simple_archive_format`
-* Puts XSLT files (for Dublin Core and ZPID Schema) in the directory, where the *.py are (as in the structure above)
-* Directory `make_simple_archive_format` contains two subdirectories `PDF` and `XML`
-	* `PDF` contains all files (bitstreams) for batch import
+* Puts XSLT files (for Dublin Core and ZPID Schema) in the directory, where all the *.py files are (as in the structure above)
+* Directory `make_simple_archive_format` contains two subdirectories `PDF-A` and `XML`
+	* `PDF-A` contains all files (bitstreams) for batch import
 	* `XML` contains metadata of the files (bitstreams) in XML
 * Sets variables `xsl_files` and `collection` in `dspace-xslt-archive.py`
 * **NOTE:**
-	* The name of the directory `make_simple_archive_format` does not matter, but the names of its subdirectories must be `PDF` and `XML`.
+	* The name of the directory `make_simple_archive_format` does not matter, but the names of its subdirectories must be `PDF-A` and `XML`.
 	* The PDF files and their corresponding XML documents must contain the same `file_basename` (e.g. `32302` in `003-003 32302.pdf` and `8454-32302.xml`).
     ```
     file_basename = re.search("\d+.pdf", pdf_filename)

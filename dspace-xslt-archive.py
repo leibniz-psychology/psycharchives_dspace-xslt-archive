@@ -12,7 +12,7 @@ handles = {'article':'20.500.12034/6', 'bachelorThesis':'20.500.12034/723',
 			'book':'20.500.12034/4', 'bookPart':'20.500.12034/586',
 			'code':'20.500.12034/721', 'conferenceObject':'20.500.12034/7', 
 			'courseMaterial':'20.500.12034/8', 'doctoralThesis':'20.500.12034/724',
-			'habilitationTreatise':'20.500.12034/725', 'image':'20.500.12034_627',
+			'habilitationTreatise':'20.500.12034/725', 'image':'20.500.12034/627',
 			'masterThesis':'20.500.12034/10', 'movingImage':'20.500.12034/626',
 			'other':'20.500.12034/720', 'preprint':'20.500.12034/718',
 			'preregistration':'20.500.12034/736', 'report':'20.500.12034/9',
@@ -21,7 +21,10 @@ handles = {'article':'20.500.12034/6', 'bachelorThesis':'20.500.12034/723',
 
 # {'schema': 'XSLT file'}
 # xsl_files = {'dc': 'xoai-ssoar_to_dc-psycharchives.xsl', 'zpid': 'xoai-ssoar_to_zpid-psycharchives.xsl'}
-xsl_files = {'dc': 'jats-psychosozial-verlag_to_dc-psycharchives.xslt', 'zpid': 'jats-psychosozial-verlag_to_zpid-psycharchives.xslt'}
+# xsl_files = {'dc': 'jats-psychosozial-verlag_to_dc-psycharchives.xslt', 'zpid': 'jats-psychosozial-verlag_to_zpid-psycharchives.xslt'}
+# xsl_files = {'dc': 'oai_dc-journal_fuer_psychologie_to_dc-psycharchives.xsl', 'zpid': 'oai_dc-journal_fuer_psychologie_to_zpid-psycharchives.xsl'}
+xsl_files = {'dc': 'journalseite_psychosozial-verlag_to_dc-psycharchives.xslt', 'zpid': 'journalseite_psychosozial-verlag_to_zpid-psycharchives.xslt'}
+# xsl_files = {'dc': 'crossref_psychosozial-verlag_to_dc-psycharchives.xsl', 'zpid': 'crossref_psychosozial-verlag_to_zpid-psycharchives.xsl'}
 
 # For writing the file `collections`
 collection = handles['article']
@@ -31,7 +34,7 @@ collection = handles['article']
 Start Workflow
 """
 if len(sys.argv) != 2:
-	print("Usage: python dspace-xslt-archive.py [Directory-make_simple_archive_format]")
+	print("Usage: python3 dspace-xslt-archive.py [Directory:make_simple_archive_format]")
 	sys.exit()
 
 input_base_path = sys.argv[1]

@@ -8,7 +8,7 @@ class Item:
 
     def __init__(self, file_basename, pdf_filename, xml_filename):
         self.basename = file_basename
-        self.pdf = pdf_filename
+        self.pdf = pdf_filename # a list of PDF filenames (type: array)
         self.xml = xml_filename
 
         
