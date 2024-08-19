@@ -8,7 +8,7 @@ class Item:
 
     def __init__(self, file_basename, pdf_filename, xml_filename):
         self.basename = file_basename
-        self.pdf = pdf_filename # a list of PDF filenames (type: array)
+        self.pdf = pdf_filename # a list of PDF/A filenames (type: array), because an item can contain more than one bitstreams
         self.xml = xml_filename
 
         

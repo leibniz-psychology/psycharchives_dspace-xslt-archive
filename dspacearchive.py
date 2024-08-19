@@ -8,6 +8,7 @@ import os
 import re
 from item import Item
 from saxonche import *
+import xml.etree.ElementTree as ET
 from shutil import copy, make_archive
 
 class DspaceArchive:
@@ -18,15 +19,14 @@ class DspaceArchive:
     The constructor takes a path to a csv file. 
     It then parses the file, creates items, and adds the items to the archive.  
     """
-    def __init__(self, input_base_path, xsl_files, collection):
+    def __init__(self, input_base_path, xsl_files):
         self.items = []
         self.input_base_path = input_base_path
         self.xsl_files = xsl_files
-        self.collection = collection
 
         """
         Extract file_basename from XML filename
-        @pdf_files: An Array which contains all bitstreams of an item. An item can contain more than one bitstreams (PDF files).
+        @pdf_files: An Array which contains all bitstreams of an item. An item can contain more than one bitstreams (PDF/A files).
         @file_basename: Both XML and PDF must contain the same @file_basename, so that they can be matched
         """
         if os.path.exists(os.path.join(self.input_base_path, 'XML')):
@@ -43,7 +43,6 @@ class DspaceArchive:
                         pdf_files.append(pdf_filename)
 
                 item = Item(file_basename, pdf_files, xml_filename)
-                # print(vars(item))
                 self.addItem(item)
         
 
@@ -61,7 +60,7 @@ class DspaceArchive:
 
 
     """
-    Write the archie to disk in the format specified by the DSpace Simple Archive format.
+    Write the archive to disk in the format specified by the DSpace Simple Archive format.
     """
     def write(self, dir = "."):
         self.create_directory(dir)
@@ -72,18 +71,19 @@ class DspaceArchive:
             item_path = os.path.join(dir, item.basename)
             self.create_directory(item_path)
             print("====== Writing Item_%03d: " % (int(index) + 1), item_path, " ======")
-
-            #contents file
-            self.writeContentsFile(item, item_path)
-
-            #collections_file
-            self.writeCollectionsFile(item, item_path)
+            
+            #metadata file(s)
+            self.writeMetadata(item, item_path)
 
             #content files (aka bitstreams)
             self.copyFiles(item, item_path)
 
-            #Metadata file
-            self.writeMetadata(item, item_path)
+            #collections_file
+            self.writeCollectionsFile(item_path)
+
+            #contents file
+            self.writeContentsFile(item, item_path)
+
 
     """
     Create a zip file of the archive. 
@@ -110,9 +110,29 @@ class DspaceArchive:
     """
     Create a collections file that contains the collection(s) for an item
     """
-    def writeCollectionsFile(self, item, item_path):
+    def writeCollectionsFile(self, item_path):
+        # handles of all collections in lx86
+        handles = {'article':'20.500.12034/6', 'bachelorThesis':'20.500.12034/723', 
+			'book':'20.500.12034/4', 'bookPart':'20.500.12034/586',
+			'code':'20.500.12034/721', 'conferenceObject':'20.500.12034/7', 
+			'courseMaterial':'20.500.12034/8', 'doctoralThesis':'20.500.12034/724',
+			'habilitationTreatise':'20.500.12034/725', 'image':'20.500.12034/627',
+			'masterThesis':'20.500.12034/10', 'movingImage':'20.500.12034/626',
+			'other':'20.500.12034/720', 'preprint':'20.500.12034/718',
+			'preregistration':'20.500.12034/736', 'report':'20.500.12034/9',
+			'researchData':'20.500.12034/576', 'review':'20.500.12034/719',
+			'sound':'20.500.12034/722', 'test':'20.500.12034/12'}
+        
+        # Get the FIRST 'dc.type' from PsychArchives XML
+        namespace = {'dc': 'http://purl.org/dc/elements/1.1/'}
+        tree = ET.parse(os.path.join(item_path, 'dublin_core.xml'))
+        root = tree.getroot()
+        dc_type = root.find("./dc:dcvalue[@element='type']", namespace)
+        collection = handles[dc_type.text]
+
+        # Write the handle of the FIRST dc.type into collections file
         collections_file = open(os.path.join(item_path, 'collections'), "w")
-        collections_file.write(self.collection)
+        collections_file.write(collection)
         collections_file.close()
 
     """
@@ -123,7 +143,7 @@ class DspaceArchive:
             copy(os.path.join(self.input_base_path, 'PDF-A' , pdf_filename), item_path)
 
     """
-    Convert input XML documents into PsychArchives Metadata Schema  
+    Convert input XML documents into PsychArchives Metadata Schema
     """
     def writeMetadata(self, item, item_path):
         with PySaxonProcessor(license=False) as proc:
@@ -133,6 +153,7 @@ class DspaceArchive:
                 executable.set_initial_match_selection(file_name=os.path.join(self.input_base_path, 'XML' , item.xml))
                 executable.set_global_context_item(file_name=os.path.join(self.input_base_path, 'XML' , item.xml))  # Set the global context item for the transformation. (Enable the use of global variables in XSLT)
 
+                # It is possible to have Dublin Core and further schemas
                 if schema == 'dc':
                     xml_filename = 'dublin_core.xml'
                 else:
