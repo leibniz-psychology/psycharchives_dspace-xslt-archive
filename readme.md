@@ -17,6 +17,8 @@ Example Structure:
 ├── dspace-xslt-archive.py
 ├── dspacearchive.py
 ├── item.py
+├── jats_to_dc-psycharchives.xslt
+├── jats_to_zpid-psycharchives.xslt
 ├── make_simple_archive_format
 │   ├── PDF
 │   │   ├── document_1.pdf
@@ -33,7 +35,10 @@ Example Structure:
 Some Simple Rules:
 ---------------------
 * Usage: ./dspace-xslt-archive.py `make_simple_archive_format`
-* Puts XSLT files (for Dublin Core and ZPID Schema) in the directory, where all the *.py files are (as in the structure above)
+* Puts XSLT files (e.g. Dublin Core and ZPID Schema) in the directory, where all the *.py files are (as in the structure above)
+* **NOTE:** It is possible to use other Schema in DSpace, but make sure you have defined the new schema in the DSpace Metadata Schema Registry.
+    * `jats_to_dc-psycharchives.xslt` --> XSLT for converting JATS XML to PsychArchives Dublin Core Schema
+    * `jats_to_zpid-psycharchives.xslt` --> XSLT for converting JATS XML to PsychArchives ZPID Schema
 * Directory `make_simple_archive_format` contains two subdirectories `PDF-A` and `XML`
 	* `PDF-A` contains all files (bitstreams) for batch import
 	* `XML` contains metadata of the files (bitstreams) in XML
@@ -71,6 +76,6 @@ make_simple_archive_format_saf
     ├── dublin_core.xml
     └── metadata_zpid.xml
 ```
-* DSpace 7 Documentation: https://wiki.lyrasis.org/display/DSDOC7x/Importing+and+Exporting+Items+via+Simple+Archive+Format
+* DSpace 7 Documentation - Importing and Exporting Items via Simple Archive Format (SAF): https://wiki.lyrasis.org/pages/viewpage.action?pageId=104566653
 
      
